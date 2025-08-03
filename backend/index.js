@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import authRoute from './Routers/auth.js';  
 import userRoute from './Routers/user.js';
 import doctorRoute from './Routers/doctor.js';
+import reviewRoute from './Routers/review.js';
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -32,6 +33,8 @@ app.use(cookieParser());
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/doctors', doctorRoute);
+//app.use('/api/v1/doctors/:doctorId/reviews', reviewRoute);
+
 
 app.listen(port, () => {
     connectDB();
