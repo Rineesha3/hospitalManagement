@@ -8,6 +8,9 @@ import Doctors from '../pages/Doctors/Doctors'
 import DoctorDetails from '../pages/Doctors/DoctorDetails'
 import MyAccount from '../Dashboard/user-account/MyAccount'
 import Dashboard from '../Dashboard/doctor-account/Dashboard'
+import AdminDashboard from '../Dashboard/admin-account/Dashboard'
+import NotFound from '../pages/NotFound'
+import Forbidden from '../pages/Forbidden'
 import {Routes,Route} from 'react-router-dom'
 import ProtectedRoute from './ProtectedRoute'
 const Routers = () => {
@@ -23,6 +26,9 @@ const Routers = () => {
       <Route path="/services" element={<Services/>}/>
       <Route path="/users/profile/me" element={<ProtectedRoute allowedRoles={['patient']}><MyAccount/></ProtectedRoute>}/>
       <Route path="/doctors/profile/me" element={<ProtectedRoute allowedRoles={['doctor']}><Dashboard/></ProtectedRoute>}/>
+      <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard/></ProtectedRoute>}/>
+      <Route path="/403" element={<Forbidden/>}/>
+      <Route path="*" element={<NotFound/>}/>
     </Routes>
   )
 }

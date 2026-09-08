@@ -4,20 +4,43 @@ import { BASE_URL } from "../config.js";
 import { toast } from "react-toastify";
 import { authContext } from "../context/authContext.jsx";
 import HashLoader from "react-spinners/HashLoader.js";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { dispatch } = useContext(authContext);
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!EMAIL_REGEX.test(formData.email)) {
+      newErrors.email = "Please provide a valid email address";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
   const submitHandler = async (event) => {
     event.preventDefault();
+    if (!validate()) return;
     setLoading(true);
     try {
       const res = await fetch(`${BASE_URL}/auth/login`, {
@@ -59,31 +82,43 @@ const Login = () => {
           <div className="mb-5">
             <input
               type="email"
-              placeholder="Enter Your Email"
+              placeholder="Email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-              required
+              className={`w-full px-2 py-3 border-b border-solid ${errors.email ? "border-red-500" : "border-[#0066ff61]"} focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer`}
             />
+            {errors.email && <p className="text-red-500 text-[13px] mt-1">{errors.email}</p>}
           </div>
           <div className="mb-5">
-            <input
-              type="password"
-              placeholder="Password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className={`w-full pl-2 pr-10 py-3 border-b border-solid ${errors.password ? "border-red-500" : "border-[#0066ff61]"} focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-textColor"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                tabIndex={-1}
+              >
+                {showPassword ? <FiEye className="w-5 h-5" /> : <FiEyeOff className="w-5 h-5" />}
+              </button>
+            </div>
+            {errors.password && <p className="text-red-500 text-[13px] mt-1">{errors.password}</p>}
           </div>
           <div className="mt-7">
             <button
               type="submit"
-              className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3"
+              disabled={loading}
+              className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3 flex items-center justify-center"
             >
-              Login
+              {loading ? <HashLoader size={25} color="#ffffff" /> : "Login"}
             </button>
           </div>
           <p className="mt-5 text-textColor text-center">

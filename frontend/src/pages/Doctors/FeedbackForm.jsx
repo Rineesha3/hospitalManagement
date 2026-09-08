@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { AiFillStar } from "react-icons/ai";
-import { useParams } from "react-router-dom";
 import { BASE_URL } from "../../config";
 import { toast } from "react-toastify";
 import HashLoader from "react-spinners/HashLoader";
-const FeedbackForm = () => {
+
+const FeedbackForm = ({ doctorId, bookingId, onSuccess }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [loading, setLoading] = useState(false);
-  const { id } = useParams();
+
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -18,13 +18,14 @@ const FeedbackForm = () => {
         setLoading(false);
         return toast.error("Rating and Review Fields are required");
       }
-      const res = await fetch(`${BASE_URL}/doctors/${id}/reviews`, {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/doctors/${doctorId}/reviews`, {
         method: "post",
         headers: {
-          "Content-Type": "application-json",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ rating, reviewText }),
+        body: JSON.stringify({ bookingId, rating, reviewText }),
       });
       const result = await res.json();
       if (!res.ok) {
@@ -32,6 +33,7 @@ const FeedbackForm = () => {
       }
       setLoading(false);
       toast.success(result.message);
+      onSuccess?.();
     } catch (err) {
       setLoading(false);
       toast.error(err.message);
@@ -44,7 +46,7 @@ const FeedbackForm = () => {
         <h3 className="text-headingColor text-[16px] leading-6 font-semibold mb-4">
           How would you rate the overall experience?*
         </h3>
-        <div>
+        <div className="flex flex-wrap">
           {[...Array(5).keys()].map((_, index) => {
             index += 1;
             return (
@@ -81,10 +83,10 @@ const FeedbackForm = () => {
           className="border border-solid border-[#0066ff34] focus:outline outline-primaryColor w-full px-4 py-3 rounded-md"
           rows="5"
           placeholder="Write your message"
-          onChange={() => setReviewText(e.target.value)}
+          onChange={(e) => setReviewText(e.target.value)}
         ></textarea>
       </div>
-      <button type="submit" onClick={handleSubmitReview} className="btn">
+      <button type="submit" onClick={handleSubmitReview} className="btn w-full sm:w-auto mt-4">
         {loading ? <HashLoader size={25} color="#fff" /> : "Submit Feedback"}
       </button>
     </form>

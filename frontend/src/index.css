@@ -11,7 +11,7 @@
 
 @layer components{
     .container{
-        @apply max-w-full w-[1440px] px-5 mx-auto
+        @apply w-full max-w-[1440px] px-5 mx-auto
     }
     .btn{
         @apply bg-primaryColor py-[15px] px-[35px] rounded-[50px] text-white font-[600] mt-[38px]
@@ -37,9 +37,6 @@
 }
 
 @media only screen and (max-width:1024px){
-    .container{
-        @apply w-full;
-    }
     section{
         @apply py-[35px];
     }
@@ -47,10 +44,13 @@
 
 @media only screen and (max-width: 768px){
     .heading{
-        @apply text-[26px] leading-[36pxx];
+        @apply text-[26px] leading-[36px];
     }
     .text__para{
         @apply text-[16px] leading-7 mt-3;
+    }
+    .header{
+        @apply h-[80px] leading-[80px];
     }
 }
 
@@ -65,13 +65,4 @@
   margin: 0 !important;
   padding: 0 !important;
   height: auto !important;
-}
-.sticky__header {
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 999;
-  background-color: #000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }

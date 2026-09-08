@@ -1,14 +1,34 @@
-import { useState, useEffect,useContext } from "react";
-import { authContext } from '../../context/authContext.jsx';
+import { useState, useEffect, useContext } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import uploadImageToCloudinary from "../../utils/uploadCloudinary";
-import { BASE_URL, token } from "../../config.js";
+import { BASE_URL } from "../../config.js";
 import { toast } from "react-toastify";
+import Avatar from "../../components/Avatar/Avatar";
+import { authContext } from "../../context/authContext";
+
+const SPECIALIZATIONS = [
+  "General Practitioner",
+  "Neurologist",
+  "Dermatologist",
+  "Mental Health Counselor",
+  "Pediatrician",
+  "Nutritionist",
+  "Chronic Care Specialist",
+  "Cardiologist",
+  "Surgeon",
+];
+
 const Profile = ({ doctorData }) => {
+  const { dispatch } = useContext(authContext);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
     phone: "",
     bio: "",
     gender: "",
@@ -20,18 +40,15 @@ const Profile = ({ doctorData }) => {
     experiences: [
       { startingDate: "", endingDate: "", position: "", university: "" },
     ],
-    timeSlots: [{ day: "", startTime: "", endTime: "" }],
+    timeSlots: [{ day: "", startingTime: "", endingTime: "" }],
     about: "",
     photo: "",
   });
 
-  const [file, setFile] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { dispatch, role } = useContext(authContext);
-
   useEffect(() => {
     if (doctorData) {
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         name: doctorData?.name,
         email: doctorData?.email,
         phone: doctorData?.phone,
@@ -39,15 +56,24 @@ const Profile = ({ doctorData }) => {
         gender: doctorData?.gender,
         specialization: doctorData?.specialization,
         ticketPrice: doctorData?.ticketPrice,
-        qualifications: doctorData?.qualifications,
-        experiences: doctorData?.experiences,
-        timeSlots: doctorData?.timeSlots
-      });
+        about: doctorData?.about,
+        photo: doctorData?.photo,
+        qualifications: doctorData?.qualifications?.length
+          ? doctorData.qualifications
+          : [{ startingDate: "", endingDate: "", degree: "", university: "" }],
+        experiences: doctorData?.experiences?.length
+          ? doctorData.experiences
+          : [{ startingDate: "", endingDate: "", position: "", university: "" }],
+        timeSlots: doctorData?.timeSlots?.length
+          ? doctorData.timeSlots
+          : [{ day: "", startingTime: "", endingTime: "" }],
+      }));
     }
   }, [doctorData]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   const handleFileChange = async (e) => {
@@ -56,38 +82,55 @@ const Profile = ({ doctorData }) => {
     setFormData({ ...formData, photo: data?.url });
   };
 
+  const validate = () => {
+    const newErrors = {};
+    if (formData.newPassword || formData.currentPassword || formData.confirmNewPassword) {
+      if (!formData.currentPassword) {
+        newErrors.currentPassword = "Enter your current password";
+      }
+      if (!formData.newPassword) {
+        newErrors.newPassword = "Enter a new password";
+      } else if (formData.newPassword.length < 6) {
+        newErrors.newPassword = "Password must be at least 6 characters";
+      }
+      if (formData.confirmNewPassword !== formData.newPassword) {
+        newErrors.confirmNewPassword = "Passwords do not match";
+      }
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const updateProfileHandler = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
     try {
+      const token = localStorage.getItem("token");
+      const { confirmNewPassword: _confirmNewPassword, ...payload } = formData;
+      if (!payload.newPassword) {
+        delete payload.currentPassword;
+        delete payload.newPassword;
+      }
       const res = await fetch(`${BASE_URL}/doctors/${doctorData._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       const result = await res.json();
       if (!res.ok) {
-        dispatch({
-        type: "LOGIN_SUCCESS",
-        payload: {
-          user: result.data, 
-          token,
-          role,
-        },
-      });
         throw Error(result.message);
       }
       toast.success(result.message);
+      dispatch({ type: "UPDATE_USER", payload: result.data });
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err) {
       toast.error(err.message);
     }
-    toast.success(result.message);
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-
   };
 
   const handleQualificationChange = (e, index) => {
@@ -163,6 +206,55 @@ const Profile = ({ doctorData }) => {
           />
         </div>
 
+        {/* Change Password */}
+        <p className="text-headingColor font-bold text-[16px] mb-3">Change Password</p>
+        <div className="mb-5">
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="currentPassword"
+              value={formData.currentPassword}
+              onChange={handleInputChange}
+              placeholder="Current Password"
+              className="form__input pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-textColor"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              tabIndex={-1}
+            >
+              {showPassword ? <FiEye className="w-5 h-5" /> : <FiEyeOff className="w-5 h-5" />}
+            </button>
+          </div>
+          {errors.currentPassword && <p className="text-red-500 text-[13px] mt-1">{errors.currentPassword}</p>}
+        </div>
+        <div className="mb-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleInputChange}
+              placeholder="New Password"
+              className="form__input"
+            />
+            {errors.newPassword && <p className="text-red-500 text-[13px] mt-1">{errors.newPassword}</p>}
+          </div>
+          <div>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="confirmNewPassword"
+              value={formData.confirmNewPassword}
+              onChange={handleInputChange}
+              placeholder="Re-enter New Password"
+              className="form__input"
+            />
+            {errors.confirmNewPassword && <p className="text-red-500 text-[13px] mt-1">{errors.confirmNewPassword}</p>}
+          </div>
+        </div>
+
         {/* Phone */}
         <div className="mb-5">
           <p className="form__label">Phone*</p>
@@ -191,7 +283,7 @@ const Profile = ({ doctorData }) => {
         </div>
 
         {/* Gender */}
-        <div className="mb-5 grid grid-cols-3 gap-5">
+        <div className="mb-5 grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
             <p className="form__label">Gender*</p>
             <select
@@ -208,7 +300,7 @@ const Profile = ({ doctorData }) => {
         </div>
 
         {/* Specialization */}
-        <div className="mb-5 grid grid-cols-3 gap-5">
+        <div className="mb-5 grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
             <p className="form__label">Specialization*</p>
             <select
@@ -218,9 +310,11 @@ const Profile = ({ doctorData }) => {
               className="form__input py-3.5"
             >
               <option value="">Select</option>
-              <option value="surgeon">Surgeon</option>
-              <option value="neurologist">Neurologist</option>
-              <option value="dermatologist">Dermatologist</option>
+              {SPECIALIZATIONS.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -242,7 +336,7 @@ const Profile = ({ doctorData }) => {
         <div className="mb-5">
           <p className="form__label">Qualifications*</p>
           {formData.qualifications.map((item, index) => (
-            <div key={index} className="grid grid-cols-2 gap-5 mb-4">
+            <div key={index} className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-4">
               <input
                 type="date"
                 name="startingDate"
@@ -273,7 +367,7 @@ const Profile = ({ doctorData }) => {
                 className="form__input"
                 placeholder="University"
               />
-              <div className="col-span-2 flex justify-end">
+              <div className="col-span-1 sm:col-span-2 flex justify-end">
                 <button
                   type="button"
                   onClick={() => handleRemoveQualification(index)}
@@ -310,7 +404,7 @@ const Profile = ({ doctorData }) => {
         <div className="mb-5">
           <p className="form__label">Experience*</p>
           {formData.experiences.map((item, index) => (
-            <div key={index} className="grid grid-cols-2 gap-5 mb-4">
+            <div key={index} className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-4">
               <input
                 type="date"
                 name="startingDate"
@@ -341,7 +435,7 @@ const Profile = ({ doctorData }) => {
                 className="form__input"
                 placeholder="University / Hospital"
               />
-              <div className="col-span-2 flex justify-end">
+              <div className="col-span-1 sm:col-span-2 flex justify-end">
                 <button
                   type="button"
                   onClick={() => handleRemoveExperience(index)}
@@ -376,7 +470,7 @@ const Profile = ({ doctorData }) => {
 
         {/* Time Slots */}
         <div className="mb-5">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-wrap gap-3 justify-between items-center">
             <p className="form__label">Time Slots*</p>
             <button
               type="button"
@@ -385,7 +479,7 @@ const Profile = ({ doctorData }) => {
                   ...formData,
                   timeSlots: [
                     ...formData.timeSlots,
-                    { day: "", startTime: "", endTime: "" },
+                    { day: "", startingTime: "", endingTime: "" },
                   ],
                 })
               }
@@ -397,7 +491,7 @@ const Profile = ({ doctorData }) => {
           {formData.timeSlots.map((slot, index) => (
             <div
               key={index}
-              className="grid grid-cols-3 gap-5 mb-4 items-center"
+              className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-4 items-center"
             >
               <select
                 name="day"
@@ -416,19 +510,19 @@ const Profile = ({ doctorData }) => {
               </select>
               <input
                 type="time"
-                name="startTime"
-                value={slot.startTime}
+                name="startingTime"
+                value={slot.startingTime}
                 onChange={(e) => handleTimeSlotChange(e, index)}
                 className="form__input"
               />
               <input
                 type="time"
-                name="endTime"
-                value={slot.endTime}
+                name="endingTime"
+                value={slot.endingTime}
                 onChange={(e) => handleTimeSlotChange(e, index)}
                 className="form__input"
               />
-              <div className="col-span-3 flex justify-end">
+              <div className="col-span-1 sm:col-span-3 flex justify-end">
                 <button
                   type="button"
                   onClick={() => handleRemoveTimeSlot(index)}
@@ -457,12 +551,8 @@ const Profile = ({ doctorData }) => {
         {/* Upload Photo */}
         <div className="mb-5 flex items-center gap-3">
           {formData.photo && (
-            <figure className="w-[60px] h-[60px] rounded-full border-2 border-solid border-primaryColor flex items-center justify-center">
-              <img
-                src={formData.photo}
-                alt="Profile"
-                className="w-full rounded-full"
-              />
+            <figure className="w-[60px] h-[60px] rounded-full border-2 border-solid border-primaryColor flex items-center justify-center overflow-hidden">
+              <Avatar src={formData.photo} className="w-full h-full rounded-full" />
             </figure>
           )}
           <div className="relative w-[130px] h-[50px]">

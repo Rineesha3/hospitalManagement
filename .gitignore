@@ -1,6 +1,18 @@
 # Ignore .env and node_modules in both frontend and backend
 /frontend/.env
+/frontend/.env.local
 /frontend/node_modules/
+/frontend/dist/
 
 /backend/.env
 /backend/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

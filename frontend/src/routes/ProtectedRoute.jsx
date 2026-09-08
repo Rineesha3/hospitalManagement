@@ -3,10 +3,9 @@ import { Navigate } from "react-router-dom";
 import { authContext } from "../context/authContext";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { token, role } = useContext(authContext);
-  const isAllowed = allowedRoles.includes(role);
-  const accessibleRoute =
-    token && isAllowed ? children : <Navigate to="/login" replace={true} />;
-  return accessibleRoute;
+  if (!token) return <Navigate to="/login" replace={true} />;
+  if (!allowedRoles.includes(role)) return <Navigate to="/403" replace={true} />;
+  return children;
 };
 
 export default ProtectedRoute;

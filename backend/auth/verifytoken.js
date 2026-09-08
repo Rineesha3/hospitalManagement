@@ -33,15 +33,30 @@ export const restrict = (roles) => {
   return async (req, res, next) => {
     const userId = req.userId;
 
-    const patient = await User.findById(userId);
-    const doctor = await Doctor.findById(userId);
-
-    const user = doctor || patient;
+    // Trust the role embedded in the token to avoid querying both collections,
+    // but re-verify current account status on every request so a suspension/
+    // rejection revokes access immediately even for an already-issued token.
+    const isDoctorRole = req.role === "doctor";
+    const user = isDoctorRole ? await Doctor.findById(userId) : await User.findById(userId);
 
     if (!user || !roles.includes(user.role)) {
       return res.status(403).json({
         success: false,
         message: "You're not authorized",
+      });
+    }
+
+    if (isDoctorRole && ["rejected", "suspended"].includes(user.isApproved)) {
+      return res.status(403).json({
+        success: false,
+        message: "Your doctor account is not active",
+      });
+    }
+
+    if (!isDoctorRole && user.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        message: "This account has been suspended",
       });
     }
 

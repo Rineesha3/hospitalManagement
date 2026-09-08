@@ -12,13 +12,13 @@ body{
 .sticky__header{
   width: 100%;
   height: 80px;
-  line-weight: 80px;
+  line-height: 80px;
   position: sticky;
   top: 0;
   left:0;
   z-index: 99999;
   background: white;
-  box-shadow: 3px 3px -8px 3px #ddd;
+  box-shadow: 3px 3px 8px 0 #ddd;
 }
 
 @media only screen and (max-width:768px){
@@ -43,8 +43,9 @@ body{
     flex-direction:column;
     align-items:center;
     line-height:30px;
+    padding-top: 5rem;
   }
   .show__menu{
-    display:black;
+    display:block;
   }
 }

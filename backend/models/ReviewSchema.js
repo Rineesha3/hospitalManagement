@@ -5,10 +5,18 @@ const reviewSchema = new mongoose.Schema(
     doctor: {
       type: mongoose.Types.ObjectId,
       ref: "Doctor",
+      required: true,
     },
     user: {
       type: mongoose.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    booking: {
+      type: mongoose.Types.ObjectId,
+      ref: "Booking",
+      required: true,
+      unique: true,
     },
     reviewText: {
       type: String,
@@ -48,8 +56,8 @@ reviewSchema.statics.calcAverageRatings = async function (doctorId) {
     },
   ]);
   await Doctor.findByIdAndUpdate(doctorId, {
-    totalRating: stats[0].numOfRating,
-    averageRating: stats[0].avgRating,
+    totalRating: stats[0]?.numOfRating || 0,
+    averageRating: stats[0]?.avgRating || 0,
   });
 };
 

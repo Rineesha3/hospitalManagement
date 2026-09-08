@@ -1,10 +1,31 @@
-import React from "react";
-import avatar from "../../assets/images/avatar-icon.png";
+import React, { useContext, useEffect, useState } from "react";
 import { formatDate } from "../../utils/formatDate";
 import { AiFillStar } from "react-icons/ai";
 import FeedbackForm from "./FeedbackForm.jsx";
-const Feedback = ({ reviews, totalRating }) => {
-  const [showFeedbackForm, setShowFeedbackForm] = React.useState(false);
+import { BASE_URL } from "../../config";
+import { authContext } from "../../context/authContext";
+import Avatar from "../../components/Avatar/Avatar";
+
+const Feedback = ({ doctorId, reviews, totalRating }) => {
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [reviewableBookings, setReviewableBookings] = useState([]);
+  const { token, role } = useContext(authContext);
+
+  useEffect(() => {
+    if (!token || role !== "patient" || !doctorId) return;
+    fetch(`${BASE_URL}/bookings/reviewable/${doctorId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((result) => setReviewableBookings(result.data || []))
+      .catch(() => setReviewableBookings([]));
+  }, [token, role, doctorId]);
+
+  const handleReviewed = () => {
+    setShowFeedbackForm(false);
+    setReviewableBookings((prev) => prev.slice(1));
+  };
+
   return (
     <div>
       <div className="mb-[50px]">
@@ -12,12 +33,12 @@ const Feedback = ({ reviews, totalRating }) => {
           All reviews({totalRating})
         </h4>
         {reviews?.map((review, index) => (
-          <div key={index} className="flex justify-between gap-10 mb-[30px]">
+          <div key={index} className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-10 mb-[30px]">
             <div className="flex gap-3">
-              <figure className="w-10 h-10 rounded-full">
-                <img className="w-full" src={review?.user?.photo} alt="" />
+              <figure className="w-10 h-10 rounded-full shrink-0">
+                <Avatar src={review?.user?.photo} className="w-full h-full rounded-full" />
               </figure>
-              <div>
+              <div className="min-w-0">
                 <h5 className="text-[16px] leading-6 text-primaryColor font-bold">
                   {review?.user?.name}
                 </h5>
@@ -30,7 +51,7 @@ const Feedback = ({ reviews, totalRating }) => {
               </div>
             </div>
 
-            <div className="flex gap-1">
+            <div className="flex gap-1 sm:shrink-0">
               {[...Array(review?.rating).keys()].map((_, index) => (
                 <AiFillStar key={index} color="#0067FF" />
               ))}
@@ -38,14 +59,20 @@ const Feedback = ({ reviews, totalRating }) => {
           </div>
         ))}
       </div>
-      {!showFeedbackForm && (
+      {reviewableBookings.length > 0 && !showFeedbackForm && (
         <div className="text-center">
           <button className="btn" onClick={() => setShowFeedbackForm(true)}>
             Give Feedback
           </button>
         </div>
       )}
-      {showFeedbackForm && <FeedbackForm />}
+      {showFeedbackForm && reviewableBookings[0] && (
+        <FeedbackForm
+          doctorId={doctorId}
+          bookingId={reviewableBookings[0]._id}
+          onSuccess={handleReviewed}
+        />
+      )}
     </div>
   );
 };

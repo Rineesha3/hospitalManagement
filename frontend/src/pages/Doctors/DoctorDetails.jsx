@@ -8,6 +8,7 @@ import useFetchData from "../../hooks/useFetchData";
 import Loader from "../../components/Loader/Loading";
 import Error from "../../components/Error/Error";
 import { useParams } from "react-router-dom";
+import Avatar from "../../components/Avatar/Avatar";
 const DoctorDetails = () => {
   const [tab, setTab] = useState("about");
   const { id } = useParams();
@@ -36,11 +37,11 @@ const DoctorDetails = () => {
         {loading && <Loader />}
         {error && <Error />}
         {!loading && !error && (
-          <div className="grid md:grid-cols-3 gap-[50px]">
+          <div className="grid md:grid-cols-3 gap-8 md:gap-[50px]">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-5">
-                <figure className="max-w-[200px] max-h-[200px]">
-                  <img src={photo} alt="" className="w-full" />
+              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-5">
+                <figure className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] shrink-0">
+                  <Avatar src={photo} className="w-full h-full rounded" />
                 </figure>
                 <div>
                   <span className="bg-[#CCF0F3] text-irisBlueColor py-1 px-6 lg:py-2 lg:px-6 text-[12px] leading-4 lg:text-[16px] lg:leading-7 font-semibold rounded">
@@ -49,9 +50,9 @@ const DoctorDetails = () => {
                   <h3 className="text-headingColor text-[22px] leading-9 mt-3 font-bold">
                     {name}
                   </h3>
-                  <div className="flex items-center gap-[6px]">
+                  <div className="flex items-center justify-center sm:justify-start gap-[6px]">
                     <span className="flex items-center gap-[6px] text-[14px] leading-5 lg:text-[16px] lg:leading-7 font-semibold text-headingColor">
-                      <img src={starIcon} alt="" /> {averageRating}
+                      <img src={starIcon} alt="" /> {Number(averageRating || 0).toFixed(1)}
                     </span>
                     <span className="text-[14px] leading-5 lg:text-[16px] lg:leading-7 font-[400] text-textColor">
                       ({totalRating})
@@ -66,7 +67,7 @@ const DoctorDetails = () => {
               <div className="mt-[50px] border-b border-solid border-[#0066ff34]">
                 <button
                   onClick={() => setTab("about")}
-                  className={`py-2 px-5 mr-5 text-[16px] leading-7 text-headingColor font-semibold ${
+                  className={`py-2 px-3 sm:px-5 mr-3 sm:mr-5 text-[15px] sm:text-[16px] leading-7 text-headingColor font-semibold ${
                     tab === "about"
                       ? "border-b border-solid border-primaryColor"
                       : ""
@@ -76,7 +77,7 @@ const DoctorDetails = () => {
                 </button>
                 <button
                   onClick={() => setTab("feedback")}
-                  className={`py-2 px-5 mr-5 text-[16px] leading-7 text-headingColor font-semibold ${
+                  className={`py-2 px-3 sm:px-5 mr-3 sm:mr-5 text-[15px] sm:text-[16px] leading-7 text-headingColor font-semibold ${
                     tab === "feedback"
                       ? "border-b border-solid border-primaryColor"
                       : ""
@@ -96,6 +97,7 @@ const DoctorDetails = () => {
                 )}
                 {tab === "feedback" && (
                   <Feedback
+                    doctorId={doctor._id}
                     reviews={reviews}
                     averageRating={averageRating}
                     totalRating={totalRating}

@@ -1,27 +1,27 @@
 export const faqs = [
   {
-    question: "What is your medical care?",
+    question: "How does a remote consultation work?",
     content:
-      "One Medical was founded on a better model of care one designed around patients needs that provides a higher level of quality and service affordably. We do this through innovative design, excellent customer service, and the efficient use of technology.",
+      "You book a time slot with a licensed doctor, join a secure video call at that time, and receive a treatment plan or prescription afterward, all without visiting a physical office.",
   },
   {
-    question: "What happens if I need to go a hospital?",
+    question: "Do I need to visit a hospital for any part of this?",
     content:
-      "One Medical was founded on a better model of care one designed around patients needs that provides a higher level of quality and service affordably. We do this through innovative design, excellent customer service, and the efficient use of technology.",
+      "No. Every consultation, follow-up, and prescription is handled remotely. If your case needs in-person care, your doctor will let you know and refer you to a local provider.",
   },
   {
-    question: "What happens if I need to go a hospital?",
+    question: "What do I need to join a video consultation?",
     content:
-      "One Medical was founded on a better model of care one designed around patients needs that provides a higher level of quality and service affordably. We do this through innovative design, excellent customer service, and the efficient use of technology.",
+      "A phone, tablet, or computer with a camera and a stable internet connection is enough. No app installation or special equipment is required.",
   },
   {
-    question: "Can I visit your medical office?",
+    question: "Can I get care outside of standard business hours?",
     content:
-      "One Medical was founded on a better model of care one designed around patients needs that provides a higher level of quality and service affordably. We do this through innovative design, excellent customer service, and the efficient use of technology.",
+      "Many of our doctors offer evening and weekend slots. Available time slots are shown on each doctor's profile before you book.",
   },
   {
-    question: "Does you provide urgent care?",
+    question: "Is urgent care available through this platform?",
     content:
-      "One Medical was founded on a better model of care one designed around patients needs that provides a higher level of quality and service affordably. We do this through innovative design, excellent customer service, and the efficient use of technology.",
+      "We support scheduled and same-day consultations for non-emergency concerns. For medical emergencies, please contact your local emergency services instead.",
   },
 ];

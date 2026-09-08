@@ -42,12 +42,12 @@ const quickLinks01 = [
   },
   {
     path: "/",
-    diaplay: "Blog",
+    display: "Blog",
   },
 ];
 const quickLinks02 = [
   {
-    path: "/find-a-doctor",
+    path: "/doctors",
     display: "Find a Doctor",
   },
   {
@@ -61,10 +61,6 @@ const quickLinks02 = [
 ];
 const quickLinks03 = [
   {
-    path: "/",
-    display: "Donate",
-  },
-  {
     path: "/contact",
     display: "Contact Us",
   },
@@ -73,11 +69,11 @@ const quickLinks03 = [
 const Footer = () => {
   const year = new Date().getFullYear();
   return (
-    <footer className="pb-16 pt-10">
+    <footer className="pb-16 pt-10 border-t border-solid border-gray-200">
       <div className="container">
         <div className="flex justify-between flex-col md:flex-row flex-wrap gap-[30px]">
           <div>
-            <img src={logo} alt="" />
+            <img src={logo} alt="" className="h-8 w-auto" />
             <p className="text-[16px] leading-7 font-[400] text-textColor mt-4">
               Copyright © {year} developed by Rineesha all rights reserved.
             </p>
@@ -99,7 +95,7 @@ const Footer = () => {
           <ul>
             {quickLinks01.map((item,index)=>(
               <li key={index} className="mb-4">
-                <Link to={item.path} className="text-[16px] leading-7 font-[400] text-textColor">{item.display}</Link>
+                <Link to={item.path} className="text-[16px] leading-7 font-[400] text-textColor hover:font-[700] hover:text-primaryColor transition-all">{item.display}</Link>
               </li>
             ))}
           </ul>
@@ -109,7 +105,7 @@ const Footer = () => {
           <ul>
             {quickLinks02.map((item,index)=>(
               <li key={index} className="mb-4">
-                <Link to={item.path} className="text-[16px] leading-7 font-[400] text-textColor">{item.display}</Link>
+                <Link to={item.path} className="text-[16px] leading-7 font-[400] text-textColor hover:font-[700] hover:text-primaryColor transition-all">{item.display}</Link>
               </li>
             ))}
           </ul>
@@ -119,7 +115,7 @@ const Footer = () => {
           <ul>
             {quickLinks03.map((item,index)=>(
               <li key={index} className="mb-4">
-                <Link to={item.path} className="text-[16px] leading-7 font-[400] text-textColor">{item.display}</Link>
+                <Link to={item.path} className="text-[16px] leading-7 font-[400] text-textColor hover:font-[700] hover:text-primaryColor transition-all">{item.display}</Link>
               </li>
             ))}
           </ul>

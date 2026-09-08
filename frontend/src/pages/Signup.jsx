@@ -5,10 +5,17 @@ import uploadImageToCloudinary from "../utils/uploadCloudinary";
 import { BASE_URL } from "../config.js";
 import { toast } from "react-toastify";
 import HashLoader from "react-spinners/HashLoader";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import Avatar from "../components/Avatar/Avatar";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const Signup = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewURL, setPreviewURL] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,6 +28,25 @@ const Signup = () => {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "Full name is required";
+    }
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!EMAIL_REGEX.test(formData.email)) {
+      newErrors.email = "Please provide a valid email address";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -31,6 +57,7 @@ const Signup = () => {
   };
   const submitHandler = async (event) => {
     event.preventDefault();
+    if (!validate()) return;
     setLoading(true);
     try {
       const res = await fetch(`${BASE_URL}/auth/register`, {
@@ -57,9 +84,9 @@ const Signup = () => {
       <div className="max-w-[1170px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/*img box */}
-          <div className="hidden lg:block bg-primaryColor rounded-l-lg">
-            <figure className="rounded-l-lg">
-              <img src={signupImg} alt="" className="w-full rounded-l-lg" />
+          <div className="bg-primaryColor rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none">
+            <figure className="rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none">
+              <img src={signupImg} alt="" className="w-full rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none" />
             </figure>
           </div>
           {/*sign up form */}
@@ -75,34 +102,45 @@ const Signup = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full pr-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-                  required
+                  className={`w-full px-2 py-3 border-b border-solid ${errors.name ? "border-red-500" : "border-[#0066ff61]"} focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer`}
                 />
+                {errors.name && <p className="text-red-500 text-[13px] mt-1">{errors.name}</p>}
               </div>
               <div className="mb-5">
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full pr-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-                  required
+                  className={`w-full px-2 py-3 border-b border-solid ${errors.email ? "border-red-500" : "border-[#0066ff61]"} focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer`}
                 />
+                {errors.email && <p className="text-red-500 text-[13px] mt-1">{errors.email}</p>}
               </div>
               <div className="mb-5">
-                <input
-                  type="password"
-                  placeholder="Password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="w-full pr-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className={`w-full pl-2 pr-10 py-3 border-b border-solid ${errors.password ? "border-red-500" : "border-[#0066ff61]"} focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-textColor"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <FiEye className="w-5 h-5" /> : <FiEyeOff className="w-5 h-5" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-red-500 text-[13px] mt-1">{errors.password}</p>}
               </div>
 
-              <div className="mb-5 flex items-center justify-between">
+              <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
                 <label className="text-headingColor font-bold text-[16px] leading-7">
                   Are you a:
                   <select
@@ -132,12 +170,8 @@ const Signup = () => {
 
               <div className="mb-5 flex items-center gap-3">
                 {previewURL && (
-                  <figure className="w-[60px] h-[60px] rounded-full border-2 border-solid border-primaryColor flex items-center justify-center">
-                    <img
-                      src={previewURL}
-                      alt=""
-                      className="w-full rounded-full"
-                    />
+                  <figure className="w-[60px] h-[60px] rounded-full border-2 border-solid border-primaryColor flex items-center justify-center overflow-hidden">
+                    <Avatar src={previewURL} className="w-full h-full rounded-full" />
                   </figure>
                 )}
 

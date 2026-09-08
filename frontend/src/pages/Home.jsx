@@ -1,85 +1,91 @@
 import React from "react";
-import heroImg01 from "../assets/images/hero-img01.png";
-import heroImg02 from "../assets/images/hero-img02.png";
-import heroImg03 from "../assets/images/hero-img03.png";
+import heroImg01 from "../assets/images/1.jpeg";
+import heroImg02 from "../assets/images/2.jpeg";
+import heroImg03 from "../assets/images/3.jpeg";
 import icon01 from "../assets/images/icon01.png";
 import icon02 from "../assets/images/icon02.png";
 import icon03 from "../assets/images/icon03.png";
-import faqImg from "../assets/images/faq-img.png";
-import featureImg from "../assets/images/feature-img.png";
+import faqImg from "../assets/images/5.jpeg";
+import featureImg from "../assets/images/4.jpeg";
 import videoIcon from "../assets/images/video-icon.png";
 import avatarIcon from "../assets/images/avatar-icon.png";
 import { Link } from "react-router-dom";
 import { BsArrowRight } from "react-icons/bs";
-import About from "../components/About/About.jsx";
 import ServiceList from "../components/Services/ServiceList.jsx";
 import DoctorList from "../components/Doctors/DoctorList.jsx";
-import DoctorDetails from "./Doctors/DoctorDetails.jsx";
-import DoctorCard from "../components/Doctors/DoctorCard.jsx";
 import FaqList from "../components/Faq/FaqList.jsx";
-import Footer from "../components/Footer/Footer.jsx";
+import useFetchData from "../hooks/useFetchData.jsx";
+import { BASE_URL } from "../config.js";
 //import Testimonial from "../components/Testimonial/Testimonial.jsx";
 
+const formatStat = (n) => {
+  if (!n) return "0+";
+  if (n >= 1000) return `${Math.floor(n / 1000)}K+`;
+  return `${n}+`;
+};
+
 const Home = () => {
+  const { data: stats } = useFetchData(`${BASE_URL}/stats/public`);
   return (
     <>
       {/* herosection */}
       <>
         <section className="hero__section pt-[60px] 2xl:h-[800px]">
           <div className="container">
-            <div className="flex flex-col lg:flex-row gap-[90px] items-center justify-between">
+            <div className="flex flex-col lg:flex-row gap-10 lg:gap-[90px] items-center justify-between">
               {/*hero content */}
               <div>
                 <div className="lg:w-[570px]">
                   <h1 className="text-[36px] leading-[46px] text-headingColor font-[800] md:text-[60px] md:leading-[70px]">
-                    We help patients live a healthy, longer life.
+                    Healthcare that reaches you, anywhere.
                   </h1>
                   <p className="text__para">
-                    Because every life matters, we go beyond treatment—offering
-                    hope, healing, and lasting well-being.By combining expert
-                    medical care with compassion, we ensure each patient
-                    receives the attention they deserve.
+                    Connect with licensed doctors over secure video, from
+                    wherever you are. No waiting rooms, no travel, no
+                    borders—just care when you need it.
                   </p>
-                  <button className="btn">Request an Appointment</button>
+                  <Link to="/doctors">
+                    <button className="btn">Request an Appointment</button>
+                  </Link>
                 </div>
                 {/*hero counter */}
                 <div className="mt-[30px] lg:mt-[70px] flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-[30px]">
-                  {/* Years of Experience */}
+                  {/* Consultations Completed */}
                   <div>
                     <h2 className="text-[30px] lg:text-[44px] font-[700] text-headingColor">
-                      30+
+                      {formatStat(stats?.consultationsCompleted)}
                     </h2>
                     <span className="w-[100px] h-2 bg-yellowColor rounded-full block mt-[-14px]"></span>
-                    <p className="text__para">Years of Experience</p>
+                    <p className="text__para">Consultations<br />Completed</p>
                   </div>
 
                   {/* Patients Served */}
                   <div>
                     <h2 className="text-[30px] lg:text-[44px] font-[700] text-headingColor">
-                      10K+
+                      {formatStat(stats?.patientsServed)}
                     </h2>
                     <span className="w-[100px] h-2 bg-yellowColor rounded-full block mt-[-14px]"></span>
-                    <p className="text__para">Patients Served</p>
+                    <p className="text__para">Patients<br />Served</p>
                   </div>
 
-                  {/* Certified Doctors */}
+                  {/* Licensed Doctors */}
                   <div>
                     <h2 className="text-[30px] lg:text-[44px] font-[700] text-headingColor">
-                      100+
+                      {formatStat(stats?.licensedDoctors)}
                     </h2>
                     <span className="w-[100px] h-2 bg-yellowColor rounded-full block mt-[-14px]"></span>
-                    <p className="text__para">Certified Doctors</p>
+                    <p className="text__para">Licensed<br />Doctors</p>
                   </div>
                 </div>
               </div>
               {/*hero content */}
-              <div className="flex gap-[30px] justify-end">
-                <div>
-                  <img className="w-full" src={heroImg01} alt="" />
+              <div className="w-full flex flex-col sm:flex-row gap-6 sm:gap-[30px] justify-center lg:justify-end">
+                <div className="w-full sm:w-auto">
+                  <img className="w-full aspect-[370/524] object-cover" src={heroImg01} alt="" />
                 </div>
-                <div className="mt-[30px]">
-                  <img src={heroImg02} alt="" className="w-full mb-[30px]" />
-                  <img src={heroImg03} alt="" className="w-full" />
+                <div className="w-full sm:w-auto mt-0 sm:mt-[30px]">
+                  <img src={heroImg02} alt="" className="w-full aspect-square object-cover mb-[30px]" />
+                  <img src={heroImg03} alt="" className="w-full aspect-square object-cover" />
                 </div>
               </div>
             </div>
@@ -99,12 +105,12 @@ const Home = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-[30px] mt-[30px] lg:mt-[55px]">
-            <div className="py-[30px] px-5">
+            <div className="py-6 px-4 sm:py-[30px] sm:px-5">
               <div className="flex items-center justify-center">
                 <img src={icon01} alt="" />
               </div>
               <div className="mt-[30px]">
-                <h2 className="text-[26px] leading-9 text-headingColor font-[700] text-center">
+                <h2 className="text-[20px] leading-7 sm:text-[26px] sm:leading-9 text-headingColor font-[700] text-center">
                   Find a Doctor
                 </h2>
                 <p className="text-[16px] leading-7 text-textColor font-[400] mt-4 text-center">
@@ -119,17 +125,17 @@ const Home = () => {
                 </Link>
               </div>
             </div>
-            <div className="py-[30px] px-5">
+            <div className="py-6 px-4 sm:py-[30px] sm:px-5">
               <div className="flex items-center justify-center">
                 <img src={icon02} alt="" />
               </div>
               <div className="mt-[30px]">
-                <h2 className="text-[26px] leading-9 text-headingColor font-[700] text-center">
-                  Find a Location
+                <h2 className="text-[20px] leading-7 sm:text-[26px] sm:leading-9 text-headingColor font-[700] text-center">
+                  Available Anywhere
                 </h2>
                 <p className="text-[16px] leading-7 text-textColor font-[400] mt-4 text-center">
-                  World-class care for everyone. Our Health System offers
-                  unmatched expert health care. From the lab to the clinic.
+                  No local clinic required. Connect with a doctor over video
+                  from your phone, tablet, or computer, wherever you are.
                 </p>
                 <Link
                   to="/doctors"
@@ -139,12 +145,12 @@ const Home = () => {
                 </Link>
               </div>
             </div>
-            <div className="py-[30px] px-5">
+            <div className="py-6 px-4 sm:py-[30px] sm:px-5">
               <div className="flex items-center justify-center">
                 <img src={icon03} alt="" />
               </div>
               <div className="mt-[30px]">
-                <h2 className="text-[26px] leading-9 text-headingColor font-[700] text-center">
+                <h2 className="text-[20px] leading-7 sm:text-[26px] sm:leading-9 text-headingColor font-[700] text-center">
                   Book Appointment
                 </h2>
                 <p className="text-[16px] leading-7 text-textColor font-[400] mt-4 text-center">
@@ -163,7 +169,6 @@ const Home = () => {
         </div>
       </section>
 
-      <About />
       {/*services section */}
       <section>
         <div className="container">
@@ -193,11 +198,11 @@ const Home = () => {
                   1. Schedule the appointment directly.
                 </li>
                 <li className="text__para">
-                  2. Search for your physician here, and contact their office.
+                  2. Browse available doctors and pick one that fits your needs.
                 </li>
                 <li className="text__para">
-                  3. View our physicians who are accepting new patients, use the
-                  online scheduling tool to select an appointment time.
+                  3. Choose an open time slot and join your video consultation
+                  from anywhere.
                 </li>
               </ul>
               <Link to="/">
@@ -271,19 +276,16 @@ const Home = () => {
       {/* testimonial section
       <section>
         <div className="container">
-          <div className="xl:w-[470px] mx-auto"> 
+          <div className="xl:w-[470px] mx-auto">
               <h2 className="heading text-center">What our patients say</h2>
               <p className="text__para text-center">
                 World-class care for everyone. Our health system offers
                 unmatched,expert health care.
-              </p> 
+              </p>
           </div>
           <Testimonial/>
         </div>
       </section> */}
-
-      <Footer/>
-      <DoctorDetails/>
     </>
   );
 };

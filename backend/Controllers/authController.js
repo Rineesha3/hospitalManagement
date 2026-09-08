@@ -7,8 +7,22 @@ const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET_key, { expiresIn: "15d" });
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const register = async (req, res) => {
   const { email, password, name, role, photo, gender } = req.body;
+  if (!email || !password || !name) {
+    return res.status(400).json({ success: false, message: "Email, password and name are required" });
+  }
+  if (!EMAIL_REGEX.test(email)) {
+    return res.status(400).json({ success: false, message: "Please provide a valid email address" });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
+  }
+  if (role !== "patient" && role !== "doctor") {
+    return res.status(400).json({ success: false, message: "Role must be either patient or doctor" });
+  }
   try {
     let user = null;
     if (role === "patient") {
@@ -69,6 +83,15 @@ export const login = async (req, res) => {
     }
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+    if (user.isActive === false) {
+      return res.status(403).json({ status: false, message: "This account has been suspended" });
+    }
+    if (doctor && doctor.isApproved === "rejected") {
+      return res.status(403).json({ status: false, message: "Your doctor registration was rejected" });
+    }
+    if (doctor && doctor.isApproved === "suspended") {
+      return res.status(403).json({ status: false, message: "Your doctor account has been suspended" });
     }
 
     const isPasswordMatch = await bcrypt.compare(req.body.password, user.password);
