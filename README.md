@@ -1,23 +1,68 @@
 # Hospital Management System
 
-This is a full-stack hospital management web application designed to simplify appointment booking and management under a single platform. The system provides dedicated functionality for patients, doctors, and administrators.
+A full-stack web app for finding doctors and booking appointments, with separate dashboards for patients, doctors and admins.
 
-• **Patient Management System**
+## Project Overview
 
-1. Allows patients to create accounts, log in, and manage their profiles.
-2. Enables patients to browse doctors and view detailed doctor information.
-3. Allows patients to book appointments and manage their booking history.
+Patients can search for doctors, book appointments and leave reviews. Doctors manage their availability and appointment requests, and admins manage users, doctors and bookings. The backend is a REST API built with Node.js, Express and MongoDB, and the frontend is a React app built with Vite and Tailwind CSS.
 
-• **Doctor Management System**
+## Key Features
 
-1. Provides doctors with a dedicated dashboard to view appointments.
-2. Allows doctors to manage their scheduled patient appointments.
-3. Enables doctors to update and maintain their profile information.
+- **Patients:** search doctors, book 30-minute clinic or video appointments, reschedule or cancel, and leave reviews
+- **Doctors:** manage profile and weekly availability, and confirm or reject appointment requests
+- **Admins:** approve or suspend doctors, manage patients and view all bookings
+- In-app notifications for booking updates
+- JWT authentication with role-based access control
 
-• **Admin Management System**
+## Technology Stack
 
-1. Provides a centralized dashboard for managing the hospital platform.
-2. Allows administrators to manage registered users and doctors.
-3. Enables administrators to manage appointments and contact requests.
+- **Frontend:** React, Vite, React Router, Tailwind CSS
+- **Backend:** Node.js, Express, MongoDB, Mongoose
+- **Authentication:** JWT, bcryptjs
+- **Other:** Cloudinary (profile photos), Jitsi Meet (video consultations)
 
-The system uses **React, Vite, JavaScript, and Tailwind CSS** for the frontend and **Node.js, Express.js, MongoDB** for the backend. It uses **JWT-based authentication, role-based access control** to provide secure access to different parts of the application.
+## Installation and Setup
+
+### Prerequisites
+- Node.js and npm
+- MongoDB database
+- Cloudinary account
+
+### Backend
+
+```bash
+cd backend
+npm install
+```
+
+Create a `.env` file in `backend/`:
+```
+MONGO_URL=your_mongodb_connection_string
+JWT_SECRET_key=your_jwt_secret
+```
+
+```bash
+npm run seed     # optional: adds sample data (clears existing data)
+npm start
+```
+
+The backend runs on `http://localhost:5000`.
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+Create a `.env` file in `frontend/`:
+```
+VITE_CLOUD_NAME=your_cloudinary_cloud_name
+VITE_UPLOAD_PRESET=your_cloudinary_upload_preset
+```
+
+```bash
+npm run dev
+```
+
+The frontend runs on `http://localhost:5173`.
